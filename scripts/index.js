@@ -16,7 +16,7 @@ function createCard (element, deleteCard) {
   const cardElement = cardTemplate.querySelector('.card').cloneNode(true);
   const cardElementImg = cardElement.querySelector('.card__image');
   cardElementImg.src = element.link;
-  cardElementImg.alt = element.alt;
+  cardElementImg.alt = `На фотографии изображен географический объект: ${element.name}`;
   cardElement.querySelector('.card__title').textContent = element.name;
   const closeButton = cardElement.querySelector('.card__delete-button');
   closeButton.addEventListener('click', deleteCard);
