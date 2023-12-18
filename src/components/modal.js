@@ -1,5 +1,3 @@
-import {popupTypeImage, popupImg, popupCaption} from '../index.js';
-
 //Функция открывает попап
 function openPopup(popup) {
   popup.classList.add('popup_is-opened'); // Добавляем класс для открытия попапа

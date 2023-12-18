@@ -25,7 +25,6 @@ const addFormElement = popupTypeNewCard.querySelector('.popup__form');
 const cardNameInput = addFormElement.querySelector('.popup__input_type_card-name');
 const cardUrlInput = addFormElement.querySelector('.popup__input_type_url');
 
-
 // Попап изображения
 export const popupTypeImage = document.querySelector('.popup_type_image');
 export const popupImg = popupTypeImage.querySelector('.popup__image');
@@ -87,9 +86,13 @@ function handleAddFormSubmit(event) {
   closePopup(popupTypeNewCard);
 }
 
-popupTypeEdit.querySelector('.popup__close').addEventListener('click', () => closePopup(popupTypeEdit));
-popupTypeNewCard.querySelector('.popup__close').addEventListener('click', () => closePopup(popupTypeNewCard));
-popupTypeImage.querySelector('.popup__close').addEventListener('click', () => closePopup(popupTypeImage));
+const popupTypeEditCloseButton = popupTypeEdit.querySelector('.popup__close');
+const popupTypeNewCardButton = popupTypeNewCard.querySelector('.popup__close');
+const popupTypeImageButton = popupTypeImage.querySelector('.popup__close');
+
+popupTypeEditCloseButton.addEventListener('click', () => closePopup(popupTypeEdit));
+popupTypeNewCardButton.addEventListener('click', () => closePopup(popupTypeNewCard));
+popupTypeImageButton.addEventListener('click', () => closePopup(popupTypeImage));
 
 // Устанавливаем обработчики сабмита форм
 editFormElement.addEventListener('submit', handleEditFormSubmit);
