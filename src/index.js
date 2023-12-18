@@ -1,7 +1,7 @@
 import './pages/index.css';
 import {initialCards} from './scripts/cards.js';
 import {createCard, deleteCard, toggleLikeCard} from './components/card.js';
-import {openPopup, openImgPopup, closePopup} from './components/modal.js';
+import {openPopup, closePopup} from './components/modal.js';
 
 
 // Секция мест (карточек)
@@ -9,22 +9,27 @@ const placesList = document.querySelector('.places__list');
 
 // Секция профиля
 const profileEditButton = document.querySelector('.profile__edit-button');
-const profileAddButton = document.querySelector('.profile__add-button');
+const buttonOpenAddCardForm = document.querySelector('.profile__add-button');
 const profileName = document.querySelector('.profile__title');
 const profileJob = document.querySelector('.profile__description');
 
 // Попап редактирования профиля
 const popupTypeEdit = document.querySelector('.popup_type_edit');
-const EditformElement = popupTypeEdit.querySelector('.popup__form');
-const nameInput = EditformElement.querySelector('.popup__input_type_name');
-const jobInput = EditformElement.querySelector('.popup__input_type_description');
+const editFormElement = popupTypeEdit.querySelector('.popup__form');
+const nameInput = editFormElement.querySelector('.popup__input_type_name');
+const jobInput = editFormElement.querySelector('.popup__input_type_description');
 
 // Попап добавления новой карточки
 const popupTypeNewCard = document.querySelector('.popup_type_new-card');
-const AddformElement = popupTypeNewCard.querySelector('.popup__form');
-const cardNameInput = AddformElement.querySelector('.popup__input_type_card-name');
-const cardUrlInput = AddformElement.querySelector('.popup__input_type_url');
+const addFormElement = popupTypeNewCard.querySelector('.popup__form');
+const cardNameInput = addFormElement.querySelector('.popup__input_type_card-name');
+const cardUrlInput = addFormElement.querySelector('.popup__input_type_url');
 
+
+// Попап изображения
+export const popupTypeImage = document.querySelector('.popup_type_image');
+export const popupImg = popupTypeImage.querySelector('.popup__image');
+export const popupCaption = popupTypeImage.querySelector('.popup__caption');
 
 // Заполняем список карточек из initialCards
 initialCards.forEach(function (element) {
@@ -41,12 +46,22 @@ profileEditButton.addEventListener('click', function () {
 });
 
 // Обработчик клика по кнопке добавления новой карточки
-profileAddButton.addEventListener('click', function () {
+buttonOpenAddCardForm.addEventListener('click', function () {
   openPopup(popupTypeNewCard);
-  // Очищаем инпуты формы добавления карточки
-  cardNameInput.value = '';
-  cardUrlInput.value = '';
+  // Сбрасываем значения формы добавления карточки
+  addFormElement.reset();
 });
+
+//Функция открывает попап изображения
+function openImgPopup (event) {
+  const card = event.target.closest('.card'); // Находим родительскую карточку, из которой было вызвано открытие
+  const cardImg = card.querySelector('.card__image'); // Находим изображение и подпись на карточке
+  const cardCaption = card.querySelector('.card__title');
+  popupImg.src = cardImg.src; // Устанавливаем изображение и подпись в попап изображения
+  popupImg.alt = `На фотографии изображен географический объект: ${cardCaption.textContent}`;
+  popupCaption.textContent = cardCaption.textContent;
+  openPopup(popupTypeImage); // Открываем попап изображения
+}
 
 // Обработчик сабмита формы редактирования профиля
 function handleEditFormSubmit(event) {
@@ -72,6 +87,10 @@ function handleAddFormSubmit(event) {
   closePopup(popupTypeNewCard);
 }
 
+popupTypeEdit.querySelector('.popup__close').addEventListener('click', () => closePopup(popupTypeEdit));
+popupTypeNewCard.querySelector('.popup__close').addEventListener('click', () => closePopup(popupTypeNewCard));
+popupTypeImage.querySelector('.popup__close').addEventListener('click', () => closePopup(popupTypeImage));
+
 // Устанавливаем обработчики сабмита форм
-EditformElement.addEventListener('submit', handleEditFormSubmit);
-AddformElement.addEventListener('submit', handleAddFormSubmit);
+editFormElement.addEventListener('submit', handleEditFormSubmit);
+addFormElement.addEventListener('submit', handleAddFormSubmit);
