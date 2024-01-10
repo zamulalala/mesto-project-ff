@@ -2,15 +2,13 @@
 function openPopup(popup) {
   popup.classList.add('popup_is-opened'); // Добавляем класс для открытия попапа
   document.addEventListener('keydown', closeByEsc); // Добавляем обработчик события для закрытия по клавише Esc
-  document.addEventListener('click', closePopupByOverlay); // Добавляем обработчик события для закрытия по клику вне попапа
 }
 
-//Функция закрывает попап по клику на оверлей
+// Функция закрывает попап по клику на оверлей
 function closePopupByOverlay(event) {
-  // Проверяем, что клик произошел по оверлею и не по содержимому попапа
-  if (event.target.classList.contains('popup') && !event.target.classList.contains('popup__content')) {
-    const openedPopup = document.querySelector('.popup_is-opened'); // Находим открытый попап и закрываем его
-    closePopup(openedPopup);
+  // Проверяем, что клик произошел по оверлею
+  if (event.target.classList.contains('popup')) {
+    closePopup(event.target); // передаем event.target в функцию closePopup
   }
 }
 
@@ -32,4 +30,4 @@ function closePopup(popup) {
 }
 
 // Экспортируем функции для использования в других модулях
-export {openPopup, closePopup};
+export {openPopup, closePopup, closePopupByOverlay};

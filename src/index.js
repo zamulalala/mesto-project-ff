@@ -1,8 +1,8 @@
 import './pages/index.css';
 import {initialCards} from './scripts/cards.js';
 import {createCard, deleteCard, toggleLikeCard} from './components/card.js';
-import {openPopup, closePopup} from './components/modal.js';
-import {enableValidation, clearValidation, validationConfig} from './components/validation.js';
+import {openPopup, closePopup, closePopupByOverlay} from './components/modal.js';
+import {enableValidation, clearValidation} from './components/validation.js';
 import {getUserInfo, getInitialCards, updateProfile, addCard, updateAvatar} from './components/api.js';
 
 
@@ -64,48 +64,58 @@ profileEditButton.addEventListener('click', function () {
   // Заполняем инпуты значениями из профиля
   nameInput.value = profileName.textContent;
   jobInput.value = profileJob.textContent;
-  const inputList = Array.from(editProfileFormElement.querySelectorAll('.popup__input'));
-  const buttonElement = editProfileFormElement.querySelector('.popup__button');
-  clearValidation(inputList, buttonElement, editProfileFormElement, validationConfig);
+  
+  clearValidation(editProfileFormElement, validationConfig);
 });
 
 // Обработчик клика по кнопке добавления новой карточки
 buttonOpenAddCardForm.addEventListener('click', function () {
   openPopup(popupTypeNewCard);
-  const inputList = Array.from(addFormElement.querySelectorAll('.popup__input'));
-  const buttonElement = addFormElement.querySelector('.popup__button');
-  clearValidation(inputList, buttonElement, addFormElement, validationConfig);
+  
+  clearValidation(addFormElement, validationConfig);
   // Сбрасываем значения формы добавления карточки
   addFormElement.reset();
 });
 
 profileImage.addEventListener('click', function () {
   openPopup(popupTypeAvatar);
-  const inputList = Array.from(editAvatarFormElement.querySelectorAll('.popup__input'));
-  const buttonElement = editAvatarFormElement.querySelector('.popup__button');
-  clearValidation(inputList, buttonElement, editAvatarFormElement, validationConfig);
+  
+  clearValidation(editAvatarFormElement, validationConfig);
   editAvatarFormElement.reset();
 })
 
-//Функция открывает попап изображения
-function openImgPopup (event) {
+// Функция открывает попап изображения
+function openImgPopup(event) {
   const card = event.target.closest('.card'); // Находим родительскую карточку, из которой было вызвано открытие
-  const cardImg = card.querySelector('.card__image'); // Находим изображение и подпись на карточке
-  const cardCaption = card.querySelector('.card__title');
-  popupImg.src = cardImg.src; // Устанавливаем изображение и подпись в попап изображения
-  popupImg.alt = `На фотографии изображен географический объект: ${cardCaption.textContent}`;
-  popupCaption.textContent = cardCaption.textContent;
-  openPopup(popupTypeImage); // Открываем попап изображения
-}
 
-// Функция для отображения состояния загрузки
-function showLoadingIndicator(isLoading, buttonElement) {
-  if (isLoading) {
-    buttonElement.textContent = 'Сохранение...';
-  } else {
-    buttonElement.textContent = 'Сохранить';
+  if (card) {
+    const cardData = {
+      link: card.querySelector('.card__image').src,
+      caption: card.querySelector('.card__title').textContent
+    };
+
+    setPopupImageContent(cardData.link, cardData.caption); // Устанавливаем изображение и подпись в попап изображения
+    openPopup(popupTypeImage); // Открываем попап изображения
   }
 }
+
+// Функция устанавливает контент для попапа изображения
+function setPopupImageContent(link, caption) {
+  popupImg.src = link;
+  popupImg.alt = `На фотографии изображен географический объект: ${caption}`;
+  popupCaption.textContent = caption;
+}
+
+// Инициализация слушателя событий на все попапы (клик по оверлею)
+document.querySelectorAll('.popup').forEach((popup) => {
+  popup.addEventListener('click', closePopupByOverlay);
+});
+
+// Функция для отображения состояния загрузки
+function showLoadingIndicator(isLoading, buttonElement, loadingText = 'Сохранение...', defaultText = 'Сохранить') {
+  buttonElement.textContent = isLoading ? loadingText : defaultText;
+}
+
 
 // Обработчик сабмита формы редактирования профиля
 function handleEditProfileFormSubmit(event) {
@@ -115,14 +125,14 @@ function handleEditProfileFormSubmit(event) {
   const newJob = jobInput.value;
 
   // Показываем состояние загрузки
-  showLoadingIndicator(1, popupTypeEdit.querySelector(".popup__button"));
+  showLoadingIndicator(true, event.submitter);
 
   // Вызываем функцию обновления профиля
   updateProfile(newName, newJob)
-    .then(() => {
+    .then((userInfo) => {
       // Обновляем значения профиля после успешного обновления на сервере
-      profileName.textContent = newName;
-      profileJob.textContent = newJob;
+      profileName.textContent = userInfo.name;
+      profileJob.textContent = userInfo.about;
 
       // Закрываем попап
       closePopup(popupTypeEdit);
@@ -133,7 +143,7 @@ function handleEditProfileFormSubmit(event) {
     })
     .finally(() => {
       // Скрываем состояние загрузки
-      showLoadingIndicator(0, popupTypeEdit.querySelector(".popup__button"));
+      showLoadingIndicator(false, event.submitter);
     });
 }
 
@@ -147,7 +157,7 @@ function handleAddFormSubmit(event) {
   const link = cardUrlInput.value;
 
   // Показываем состояние загрузки
-  showLoadingIndicator(1, popupTypeNewCard.querySelector(".popup__button"));
+  showLoadingIndicator(true, event.submitter);
 
   // Вызываем функцию добавления карточки на сервер
   addCard(name, link)
@@ -171,7 +181,7 @@ function handleAddFormSubmit(event) {
     })
     .finally(() => {
       // Скрываем состояние загрузки
-      showLoadingIndicator(0, popupTypeNewCard.querySelector(".popup__button"));
+      showLoadingIndicator(false, event.submitter);
     });
 }
 
@@ -183,7 +193,7 @@ function handleEditAvatarFormSubmit(event) {
   const avatarUrl = avatarUrlInput.value;
 
   // Показываем состояние загрузки
-  showLoadingIndicator(1, popupTypeAvatar.querySelector(".popup__button"));
+  showLoadingIndicator(true, event.submitter);
 
   // Вызываем функцию обновления аватара на сервере
   updateAvatar(avatarUrl)
@@ -200,7 +210,7 @@ function handleEditAvatarFormSubmit(event) {
     })
     .finally(() => {
       // Скрываем состояние загрузки
-      showLoadingIndicator(0, popupTypeAvatar.querySelector(".popup__button"));
+      showLoadingIndicator(false, event.submitter);
     });
 }
 
@@ -218,6 +228,17 @@ popupTypeAvatarButton.addEventListener('click', () => closePopup(popupTypeAvatar
 editProfileFormElement.addEventListener('submit', handleEditProfileFormSubmit);
 addFormElement.addEventListener('submit', handleAddFormSubmit);
 editAvatarFormElement.addEventListener('submit', handleEditAvatarFormSubmit);
+
+
+// Объект с настройками валидации
+const validationConfig = {
+  formSelector: '.popup__form',
+  inputSelector: '.popup__input',
+  submitButtonSelector: '.popup__button',
+  inactiveButtonClass: 'popup__button_disabled',
+  inputErrorClass: 'popup__input_type_error',
+  errorClass: 'popup__error_visible'
+};
 
 enableValidation(validationConfig);
 

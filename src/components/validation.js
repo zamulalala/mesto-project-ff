@@ -1,13 +1,3 @@
-// Объект с настройками валидации
-const validationConfig = {
-  formSelector: '.popup__form',
-  inputSelector: '.popup__input',
-  submitButtonSelector: '.popup__button',
-  inactiveButtonClass: 'popup__button_disabled',
-  inputErrorClass: 'popup__input_type_error',
-  errorClass: 'popup__error_visible'
-};
-
 // Функция отображения ошибки ввода
 const showInputError = (formElement, inputElement, errorMessage, config) => {
   const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
@@ -61,13 +51,10 @@ const enableValidation = (config) => {
   const formList = Array.from(document.querySelectorAll(config.formSelector));
 
   formList.forEach((formElement) => {
-    formElement.addEventListener('submit', function(evt) {
-      evt.preventDefault();
-
-    });
     setEventListeners(formElement, config);
   });
 };
+
 
 // Функция проверки наличия невалидных полей ввода
 function hasInvalidInput (inputList) {
@@ -88,12 +75,17 @@ function toggleButtonState (inputList, buttonElement, config) {
 }
 
 // Функция очистки ошибок валидации
-function clearValidation (inputList, buttonElement, formElement, config) {
+function clearValidation(formElement, config) {
+  const inputList = Array.from(formElement.querySelectorAll(config.inputSelector));
+  const buttonElement = formElement.querySelector(config.submitButtonSelector);
+
   buttonElement.disabled = true;
   buttonElement.classList.add(config.inactiveButtonClass);
+
   inputList.forEach((inputElement) => {
     hideInputError(formElement, inputElement, config);
-  })
+  });
 }
 
-export {enableValidation, clearValidation, validationConfig};
+
+export {enableValidation, clearValidation};

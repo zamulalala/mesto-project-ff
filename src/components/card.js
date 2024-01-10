@@ -20,7 +20,7 @@ function createCard (element, userId, deleteCard, toggleLikeCard, openImgPopup) 
   const cardElementLikeCount = cardElement.querySelector(".card__like-count");
   cardElementLikeCount.textContent = element.likes.length;
 
-  cardElement.id = element["_id"];
+  // cardElement.id = element["_id"];
 
   const buttonDeleteCard = cardElement.querySelector('.card__delete-button'); // Настраиваем обработчики событий
   if (element.owner._id === userId) {
